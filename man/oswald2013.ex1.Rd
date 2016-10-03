@@ -1,0 +1,34 @@
+\name{oswald2013.ex1}
+\docType{data}
+\alias{oswald2013.ex1}
+\title{IAT Criterion-Related Correlations}
+\description{
+Data from a meta-analysis on IAT conducted by Oswald et al., (2013) examining the predictive validity of the Implicit Association Test (IAT) and various explicit measures of bias for a variety of criterion measures of discrimination. Included in the dataset are the study-level correlations between IAT scores and criterion measures of neurological activity or response latency from the original \code{oswald2013} dataset. 
+}
+\usage{oswald2013.ex1}
+\format{
+  A dataframe containing 32 effect sizes from 9 studies.
+    
+    \tabular{rlll}{
+      [,1] \tab Study         \tab Factor \cr 
+      [,2] \tab Crit.Domain   \tab Factor \cr 
+      [,3] \tab IAT.ID        \tab Integer \cr  
+      [,4] \tab IAT.Focus     \tab Factor \cr  
+      [,5] \tab Crit.ID       \tab Integer \cr  
+      [,6] \tab Crit.Cat      \tab Factor \cr  
+      [,7] \tab Scoring       \tab Factor \cr  
+      [,8] \tab Target        \tab Factor \cr 
+      [,9] \tab Type          \tab Factor \cr  
+      [,10] \tab Sample.ID    \tab Integer \cr   
+      [,11] \tab N            \tab Integer \cr   
+      [,12] \tab R            \tab Numeric \cr 
+      [,13] \tab effect.size  \tab Numeric \cr   
+      [,14] \tab var.eff.size \tab Numeric   
+  }
+}
+\source{Oswald FL, Mitchell G, Blanton H, Jaccard J, Tetlock PE (2013) Predicting ethnic and racial discrimination: a meta-analysis of IAT criterion studies. \emph{Journal of Personality and Social Psychology}, 105(2), 171-192. ISSN 1939-1315. doi:10.1037/a0032734. PMID: 23773046.}
+
+\references{
+Oswald FL, Mitchell G, Blanton H, Jaccard J, Tetlock PE (2013) Predicting ethnic and racial discrimination: a meta-analysis of IAT criterion studies. \emph{Journal of Personality and Social Psychology}, 105(2), 171-192. ISSN 1939-1315. doi:10.1037/a0032734. PMID: 23773046.
+}
+\keyword{datasets}

@@ -1,0 +1,6 @@
+exportPattern("^[[:alpha:]]+")
+importFrom("grid", textGrob, gpar, pushViewport, viewport, grid.draw, 
+           popViewport, grid.rect, unit, convertX, grid.lines, arrow, 
+           grid.polygon, grid.xaxis, grid.text, unit.c, grid.layout)
+S3method(print, robu)
+S3method(sensitivity, robu)
