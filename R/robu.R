@@ -409,18 +409,19 @@ robu     <- function(formula, data, studynum,var.eff.size, userweights,
                                  ImHj, A.MBB2, W.r, X, Q.list)
 
    
-     W.mat <- matrix(rep(1/sqrt(data.full$r.weights),times = N),nrow = M)
+
 
      giTemp <- do.call(rbind,giTemp)
      gi_matrix <- lapply(X = 1:(p+1), FUN = function(i){ matrix(giTemp[,i], nrow = M)  })
 
 
      if (!user_weighting) {
+          W.mat <- matrix(rep(1/sqrt(data.full$r.weights),times = N),nrow = M)
           B_matrix_half <- lapply(X = gi_matrix, FUN = function(gi_mat){ W.mat * gi_mat})
      }else{
 
-
-          B_matrix_half <- lapply(X = gi_matrix, FUN = function(gi_mat){ solve(sqrt(V.big)) %*% gi_mat})
+          B_matrix_half <- gi_matrix
+         # B_matrix_half <- lapply(X = gi_matrix, FUN = function(gi_mat){ solve(sqrt(V.big)) %*% gi_mat})
      }
 
      B_mat <- lapply(X = B_matrix_half, FUN = tcrossprod)
