@@ -420,8 +420,8 @@ robu     <- function(formula, data, studynum,var.eff.size, userweights,
           B_matrix_half <- lapply(X = gi_matrix, FUN = function(gi_mat){ W.mat * gi_mat})
      }else{
 
-
-          B_matrix_half <- lapply(X = gi_matrix, FUN = function(gi_mat){ solve(sqrt(V.big)) %*% gi_mat})
+          B_matrix_half <- gi_matrix
+         # B_matrix_half <- lapply(X = gi_matrix, FUN = function(gi_mat){ solve(sqrt(V.big)) %*% gi_mat})
      }
 
      B_mat <- lapply(X = B_matrix_half, FUN = tcrossprod)
