@@ -306,8 +306,12 @@ robu     <- function(formula, data, studynum,var.eff.size, userweights,
     H             <- Xreg %*% Q %*% t(Xreg) %*% W.r.big # H = X * Q * X' * W
     ImH           <- diag(c(1), dim(Xreg)[1], dim(Xreg)[1]) - H
     data.full$ImH <- cbind(ImH)
-    ImHj          <- by(data.full$ImH, data.full$study, 
-                        function(x) as.matrix(x))
+    
+    ImHj <- lapply(split(x = ImH,f =  as.factor(data.full$study)), 
+                   function(x){matrix(x, ncol =M)})
+    #ImHj          <- by(data.full$ImH, data.full$study, 
+    #                    function(x) as.matrix(x))
+                 
     diag_one      <- by(rep(1, M), X.full$study, 
                                    function(x) diag(x, nrow = length(x)))
     ImHii         <- Map(function(X, Q, W, D) 
@@ -403,45 +407,31 @@ robu     <- function(formula, data, studynum,var.eff.size, userweights,
     giTemp                <- Map(function(I, A, W, X, Q)
                                  t(I) %*% A %*% W %*% X %*% Q, 
                                  ImHj, A.MBB2, W.r, X, Q.list)
+
    
-    dfs <- c(rep(0, p + 1))
+     W.mat <- matrix(rep(1/sqrt(data.full$r.weights),times = N),nrow = M)
+
+     giTemp <- do.call(rbind,giTemp)
+     gi_matrix <- lapply(X = 1:(p+1), FUN = function(i){ matrix(giTemp[,i], nrow = M)  })
+
+
+     if (!user_weighting) {
+          B_matrix_half <- lapply(X = gi_matrix, FUN = function(gi_mat){ W.mat * gi_mat})
+     }else{
+
+
+          B_matrix_half <- lapply(X = gi_matrix, FUN = function(gi_mat){ solve(sqrt(V.big)) %*% gi_mat})
+     }
+
+     B_mat <- lapply(X = B_matrix_half, FUN = tcrossprod)
+
+     B_trace_square <- sapply(X = B_mat, FUN = function(B){ (sum(diag(B)))^2})
+
+     B_square_trace <- sapply(X = B_mat, FUN = function(B){sum(B * B)})
+
+     dfs <- B_trace_square/B_square_trace
+
     
-      for (i in 1:(p+1)) { 
-        
-        L      <- c(rep(0,p+1))
-        L[i]   <- 1
-        Ll     <- rep(list(L), N)
-        gi     <- Map(function(G, L) G %*% cbind(L), giTemp, Ll)
-        G      <- Reduce("+", lapply(gi, function(x) tcrossprod(x)))
-        
-        if (!user_weighting){
-          
-          switch(modelweights, 
-                 
-            HIER = { # Begin HIER
-              
-              B <- solve(sqrt(W.r.big) )%*% G %*% solve(sqrt(W.r.big))
-              
-            }, # End HIER
-            
-            CORR = { # Begin CORR
-              
-              B <- solve(sqrt(W.r.big) )%*% G %*% solve(sqrt(W.r.big))
-              
-            } # End CORR
-            
-          ) 
-          
-        } else { # Begin userweights
-          
-            B <- solve(sqrt(V.big) )%*% G %*% solve(sqrt(V.big)) 
-            
-        } # End userweights
-        
-        e.val2 <- eigen(B)
-        dfs[i] <- sum(e.val2$values)^2/sum(e.val2$values^2)
-        
-      } # End loop
     
     VR.MBB1 <- solve(sumXWX.r) %*% sumXWA.MBBeeA.MBBWX.r %*% solve(sumXWX.r)
     VR.r    <- VR.MBB1
