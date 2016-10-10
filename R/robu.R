@@ -306,8 +306,12 @@ robu     <- function(formula, data, studynum,var.eff.size, userweights,
     H             <- Xreg %*% Q %*% t(Xreg) %*% W.r.big # H = X * Q * X' * W
     ImH           <- diag(c(1), dim(Xreg)[1], dim(Xreg)[1]) - H
     data.full$ImH <- cbind(ImH)
-    ImHj          <- by(data.full$ImH, data.full$study, 
-                        function(x) as.matrix(x))
+    
+    ImHj <- lapply(split(x = ImH,f =  as.factor(data.full$study)), 
+                   function(x){matrix(x, ncol =M)})
+    #ImHj          <- by(data.full$ImH, data.full$study, 
+    #                    function(x) as.matrix(x))
+                 
     diag_one      <- by(rep(1, M), X.full$study, 
                                    function(x) diag(x, nrow = length(x)))
     ImHii         <- Map(function(X, Q, W, D) 
