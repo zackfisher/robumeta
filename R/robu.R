@@ -460,8 +460,8 @@ robu     <- function(formula, data, studynum,var.eff.size, userweights,
                            ifelse(prob > .01 & prob < .05, "**",
                            ifelse(prob > .05 & prob < .10, "*", "")))
     reg_table           <- cbind(labels, reg_table, sig)
-    colnames(reg_table) <- c("labels", "b.r", "SE", "t", "dfs", "prob", "CI.U", 
-                             "CI.L", "sig")
+    colnames(reg_table) <- c("labels", "b.r", "SE", "t", "dfs", "prob", "CI.L", 
+                             "CI.U", "sig")
   
    if (!small) { # Begin small = FALSE
  
