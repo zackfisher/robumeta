@@ -109,12 +109,14 @@ robu     <- function(formula, data, studynum,var.eff.size, userweights,
   sumXWJWX         <- Reduce("+", Map(function(X, W, J) 
                                       t(X) %*% W %*% J %*% W %*% X, 
                                       X, W, J))
-  sumXWVWX         <- Reduce("+", Map(function(X, W, V) 
-                                      t(X) %*% W %*% V %*% W %*% X, 
-                                      X, W, vee))
-  sumXW.sig.m.v.WX <- Reduce("+", Map(function(X, W, V) 
-                                      t(X) %*% W %*% V %*% W %*% X, 
-                                      X, W, SigmV))
+
+  Matrx_WKXX       <- Reduce("+",  
+                             Map(function(X, W, k) { t(X) %*% (W / k) %*% X},  
+                             X, W, k_list))  
+    
+  Matrx_wk_XJX_XX <- Reduce("+", 
+                            Map(function(X, W, J, k) {(W / k)[1,1] * ( t(X) %*% J %*% X - t(X) %*% X) }, 
+                           X, W, J, k_list))  
   
   switch(modelweights, 
     
@@ -238,8 +240,8 @@ robu     <- function(formula, data, studynum,var.eff.size, userweights,
       # through the rho*term2 component.
       
       denom   <- sumW - sum(diag(solve(sumXWX) %*% sumXWJWX)) 
-      termA   <- sum(diag(solve(sumXWX) %*% sumXWVWX))
-      termB   <- sum(diag(solve(sumXWX) %*% sumXW.sig.m.v.WX ))
+      termA   <- sum(diag(solve(sumXWX) %*% Matrx_WKXX)) #ZH_edit 
+      termB   <- sum(diag(solve(sumXWX) %*% Matrx_wk_XJX_XX ))#ZH_edit 
       term1   <- (Qe - N + termA) / denom 
       term2   <- termB / denom 
       tau.sq1 <- term1 + rho * term2 
