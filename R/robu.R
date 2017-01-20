@@ -86,7 +86,8 @@ robu     <- function(formula, data, studynum,var.eff.size, userweights,
   p                <- ncol(X.full) - 2 # Number of (non-intercept) covariates 
   N                <- max(data.full$study) # Number of studies
   W                <- as.matrix(by(data.full$weights, data.full$study, 
-                                   function(x) diag(x, nrow = length(x))))
+                                   function(x) diag(x, nrow = length(x)),
+                                   simplify = FALSE))
   X                <- data.matrix(X.full)
   X                <- lapply(split(X[,2:(p + 2)], X[,1]), matrix, ncol = p + 1)
   y                <- by(data.full$effect.size, data.full$study, 

@@ -1,8 +1,8 @@
 Package: robumeta
 Type: Package
 Title: Robust Variance Meta-Regression
-Version: 1.6
-Date: 2015-03-18
+Version: 1.8
+Date: 2016-11-03
 Author: Zachary Fisher, Elizabeth Tipton, and Zhipeng Hou.
 Maintainer: Zachary Fisher <fish.zachary@gmail.com>
 Depends: grid
