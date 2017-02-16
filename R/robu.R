@@ -352,7 +352,7 @@ robu     <- function(formula, data, studynum,var.eff.size, userweights,
     sumXWA.MBBeeA.MBBWX.r <- Reduce("+", sumXWA.MBBeeA.MBBWX.r) 
     giTemp                <- Map(function(I, A, W, X, Q)
                                  t(I) %*% A %*% W %*% X %*% Q, 
-                                 ImHj, A.MBB2, W.r, X, Q.list)
+                                 ImHj, A.MBB, W.r, X, Q.list)
 
    
 
