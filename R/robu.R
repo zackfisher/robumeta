@@ -317,8 +317,9 @@ robu     <- function(formula, data, studynum,var.eff.size, userweights,
         
     if (!user_weighting){
       
-       Working_Matrx_E_j <- W.r
-       Working_Matrx_E <- W.r.big
+      Working_Matrx_E <- diag(1/data.full$r.weights)  #1/W
+      Working_Matrx_E_j <- by(data.full$r.weights, data.full$study, # Wj
+                              function(x) diag(1/x, nrow = length(x))) #1/W_j
 
     } else { # Begin userweights
       
