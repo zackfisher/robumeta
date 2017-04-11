@@ -95,7 +95,7 @@ predict.robu <- function(object, pred_vector, level = 0.95){
   g_hat <- test_vec %*% coef_est
   
   #calculate F-test with small sample correction
-  Test_result <- Wald_test(new_robu_model, constraints = test_vec, vcov="CR2")
+  Test_result <- clubSandwich::Wald_test(new_robu_model, constraints = test_vec, vcov="CR2")
   
   #Retrive t statistics and confidence interval. 
   df <- Test_result$df 
