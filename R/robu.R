@@ -315,39 +315,104 @@ robu     <- function(formula, data, studynum,var.eff.size, userweights,
     #ImHj          <- by(data.full$ImH, data.full$study, 
     #                    function(x) as.matrix(x))
         
+    
+    diag_one      <- by(rep(1, M), X.full$study, 
+                        function(x) diag(x, nrow = length(x)))
+    
+    ImHii         <- Map(function(X, Q, W, D) 
+      D - X %*% Q %*% t(X) %*% W,
+      X, Q.list, W.r, diag_one)
+    
+    
     if (!user_weighting){
       
       Working_Matrx_E <- diag(1/data.full$r.weights)  #1/W
       Working_Matrx_E_j <- by(data.full$r.weights, data.full$study, # Wj
                               function(x) diag(1/x, nrow = length(x))) #1/W_j
 
+      
+      switch(modelweights, 
+             HIER = {
+               # Inside Matrix = E_j^0.5 * ImH_j *E * t(ImH_j) * E_j^0.5
+               # In this case, the formula can be simplified to 
+               # Inside Matrix = E_j^0.5 * ImH_jj * E_j^1.5
+               InsideMatrx_list <-   Map(
+                 function (W_E_j, ImH_jj) {
+                   sqrt(W_E_j) %*% ImH_jj %*% (W_E_j^1.5)
+                 },
+                 Working_Matrx_E_j, ImHii)
+               
+               eigenres_list <- lapply(InsideMatrx_list, function(x) eigen(x))
+               eigenval_list <- lapply(eigenres_list, function(x) x$values)
+               eigenvec_list <- lapply(eigenres_list, function(x) x$vectors)
+               
+               A.MBB  <- Map(function (eigenvec, eigenval, k, W_E_j) {
+                                eigenval_InvSqrt <- ifelse(eigenval< 10^-10, 0, 1/sqrt(eigenval)) # Pseudo_Inverse
+                                sqrt(W_E_j) %*% eigenvec %*% diag(eigenval_InvSqrt, k, k) %*% t(eigenvec) %*%sqrt(W_E_j) # Pseudo_Inverse
+                             },
+                             eigenvec_list, 
+                             eigenval_list, 
+                             k_list,
+                             Working_Matrx_E_j)
+               
+             },
+             
+             CORR = {
+               # In this case, the formula can be simplified to 
+               # A_MBB =  ImH_jj ^ (-0.5)
+               
+               eigenres_list <- lapply(ImHii, function(x) eigen(x))
+               eigenval_list <- lapply(eigenres_list, function(x) x$values)
+               eigenvec_list <- lapply(eigenres_list, function(x) x$vectors)
+               
+               A.MBB  <- Map(function (eigenvec, eigenval, k, W_E_j) {
+                               eigenval_InvSqrt <- ifelse(eigenval< 10^-10, 0, 1/sqrt(eigenval)) # Pseudo_Inverse
+                               eigenvec %*% diag(eigenval_InvSqrt, k, k) %*% t(eigenvec) # Pseudo_Inverse
+                            },
+                            eigenvec_list, 
+                            eigenval_list, 
+                            k_list,
+                            Working_Matrx_E_j)
+             })
+      
+      
     } else { # Begin userweights
       
       V.big        <- diag(c(1), dim(Xreg)[1], dim(Xreg)[1]) %*% 
         diag(data.full$avg.var.eff.size)
       v.j          <- by(data.full$avg.var.eff.size, data.full$study, 
                          function(x) diag(x, nrow = length(x)))
+      v.j.sqrt_list     <- lapply(v.j, function (x) sqrt(x))
+      
       Working_Matrx_E_j <- v.j
       Working_Matrx_E <- V.big
+      
+      InsideMatrx_list <-   Map(
+        function (ImH_j) {
+           ImH_j %*% Working_Matrx_E %*% t(ImH_j)
+        },
+        ImHj)
+      
+      eigenres_list <- lapply(InsideMatrx_list, function(x) eigen(x))
+      eigenval_list <- lapply(eigenres_list, function(x) x$values)
+      eigenvec_list <- lapply(eigenres_list, function(x) x$vectors)
+      
+      A.MBB  <- Map(function (eigenvec, eigenval, k, v.j.sqrt) {
+                      eigenval_InvSqrt <- ifelse(eigenval< 10^-10, 0, 1/sqrt(eigenval)) # Pseudo_Inverse
+                      v.j.sqrt %*% eigenvec %*% diag(eigenval_InvSqrt, k, k) %*% t(eigenvec)  # Pseudo_Inverse
+                    },
+                    eigenvec_list, 
+                    eigenval_list, 
+                    k_list,
+                    v.j.sqrt_list)
+      
+      
     } # End userweights
     
-    
-    A.MBB_inv_square <- Map(
-      function (W_E, ImH_j) {
-        tcrossprod(sqrt(W_E) %*% ImH_j %*%sqrt(Working_Matrx_E))
-      },
-      Working_Matrx_E_j, ImHj)
-    
-    eigenvec <- lapply(A.MBB_inv_square, function(x) eigen(x)$vectors) 
-    eigenval <- lapply(A.MBB_inv_square, function(x) eigen(x)$values)
-    
-    A.MBB  <- Map(function (eigenvec, eigenval, k_list, W_E) 
-      sqrt(W_E) %*% eigenvec %*% diag(1/sqrt(eigenval), k_list, k_list) %*% t(eigenvec) %*%sqrt(W_E),
-      eigenvec, eigenval, k_list,Working_Matrx_E_j)
-   
     sumXWA.MBBeeA.MBBWX.r <- Map(function(X,W,A,S) 
       t(X) %*% W %*% A %*% S %*% A %*% W %*%X, 
       X, W.r, A.MBB, sigma.hat.r)
+    
     
     
     sumXWA.MBBeeA.MBBWX.r <- Reduce("+", sumXWA.MBBeeA.MBBWX.r) 
