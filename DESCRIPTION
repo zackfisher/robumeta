@@ -1,11 +1,18 @@
 Package: robumeta
 Type: Package
 Title: Robust Variance Meta-Regression
-Version: 1.9
-Date: 2017-02-20
-Author: Zachary Fisher, Elizabeth Tipton, and Zhipeng Hou.
-Maintainer: Zachary Fisher <fish.zachary@gmail.com>
-Depends: grid
+Version: 2.0
+Date: 2017-05-29
+Authors@R: c(
+ person("Zachary","Fisher", email = "fish.zachary@gmail.com", role = c("aut", "cre")),
+ person("Elizabeth", "Tipton", role = "aut"),
+ person("Hou", "Zhipeng", role = "aut")
+ )
+Suggests: clubSandwich, R.rsp
 Description: Functions for conducting robust variance estimation (RVE) meta-regression using both large and small sample RVE estimators under various weighting schemes. These methods are distribution free and provide valid point estimates, standard errors and hypothesis tests even when the degree and structure of dependence between effect sizes is unknown. Also included are functions for conducting sensitivity analyses under correlated effects weighting and producing RVE-based forest plots. 
+URL: https://github.com/zackfisher/robumeta
+BugReports: https://github.com/zackfisher/robumeta/issues
 License: GPL-2
 LazyData: true
+RoxygenNote: 6.0.1
+VignetteBuilder: R.rsp

@@ -2,68 +2,84 @@
 % Please edit documentation in R/predict.robu.R
 \name{predict.robu}
 \alias{predict.robu}
-\title{Predict method for robumeta model fits.}
+\title{Prediction method for a robumeta object.}
 \usage{
-\method{predict}{robu}(object, pred_vector, level = 0.95)
+\method{predict}{robu}(object, pred.vector, level = 0.95, ...)
 }
 \arguments{
 \item{object}{A fitted robumeta model object.}
 
-\item{pred_vector}{A prediction vector for hypothesis test. This contains the covariate values we have. The conditional mean value, as well as its confidence interval, of the outcome (dependent) variable will be predicted given the values.
+\item{pred.vector}{A prediction vector containing the new covariate values.}
 
- INTERCEPT: If intercept is included in the robumeta model, the first element should always be 1, which represents the intercept, and followed by the covariate values in order. If the robumeta model does non have an intercept, the prediction vector should begin with the first covariate value.
+\item{level}{Confidence level.}
 
- VARIABLE TYPE: For a continuous variable, we just use the variable value as the corresponding element value in the vector. For a categorical variable, the original variable value should be transformed by the coding system identical to the one used in the robumeta model.(Dummy coding, deviation coding, etc.)
- 
- NA VALUES: If the vector contains NAs, \code{predict.robu} will remove the corresponding covariates from the original data, and refit a new robumeta model.The prediction and confidence interval will be estimated based on that new model.}
-
-\item{level}{Tolerance/confidence level.}
+\item{...}{Additional arguments to predict.}
 }
 \value{
-\code{predict.robu}   produces a vector of prediction and confidence interval with element names \code{prediction, se, df, t_score, lowerBound,} and \code{upperBound}.
+\code{prediction} the predicted value based on the prediction vector.
 
-\code{prediction:}   the predicted value based on the prediction vector.
+\code{se} The standard error for the  predicted mean.
 
-\code{se:}  standard error of predicted mean
+\code{t} The t-statistic calculated based on the predicted mean.
 
-\code{t_score:} The t-statistic calculated based on the predicted mean.
+\code{df} The small sample corrected degrees of freedom of the distribution of the t-statistic.
 
-\code{df:}  The small sample corrected degrees of freedom of the distribution of the t-statistic.
+\code{lower} The lower bound of the confidence interval for the predicted mean.
 
-\code{lowerBound:} lower bound of the confidence interval for the predicted mean.
-
-\code{upperBound:} upper bound of the confidence interval for the predicted mean.
+\code{upper} The upper bound of the confidence interval for the predicted mean.
 }
 \description{
-\code{predict.robu} obtains the predicted outcome mean and confidence interval of a fitted robumeta model object given a prediction vector.
+\code{predict.robu} produces the predicted mean and confidence interval of a fitted robumeta model object given a prediction vector.
 }
-\examples{
-require(robumeta)
-require(clubSandwich)
-
-## Fit a robumeta model by robu() function. 
-
-
-
-robu_mod <- robu(LOR1 ~ study_design + duration + service_hrs, 
-                 data = dropoutPrevention, studynum = studyID, var.eff.size = varLOR, 
-                 modelweights = "HIER",small = T)
-
-## Construct the prediction vector for the predicted mean given 
-## study_design = "Matched", duration = 38 and service_rs = 5.
-##
-## In this robumeta model, the first covariate is a categorical variable that contains three levels:
-## "Matched" (33\%, dummy code: 00), "Randomized"(24\%, 01) and "non-match non-randomized"(43\%, 10).
-##
-## The corresponding prediction vector begins with 1 (intercept), and followed by 0 0, the dummy code for "Mateched".
-## The last two elements are 38 and 5, which are the values for duration and sevice_hrs.
-                                           
-predict(object = robu_mod,pred_vector = c(1,0,0,38,5),level = 0.95)
-
-## If we do not know the value of duration, the prediction vector should be c(1,0,0,NA,5). 
-## predict.robu() will refit a new model without the covariate duration, and the prediction will be based on it.
-
-predict(object = robu_mod,pred_vector = c(1,0,0,NA,5),level = 0.95)
-
+\details{
+\itemize{
+   \item{\code{intercept}} {
+     If an intercept is included in the robumeta model, 
+     the first element should always be 1, representing the intercept, 
+     followed by the covariate values in appropriate order. 
+     If the robumeta model does not have an intercept, the prediction 
+     vector should begin with the first covariate value.
+   }
+   \item{\code{variable}} {
+     For continuous variables, use the variable value as the 
+     corresponding element value in \code{ pred.vector}. 
+     For a categorical variable the original variable value should 
+     be transformed to match the coding system used in the robumeta 
+     model (e.g. dummy coding, deviation coding, etc.).
+   }
+   \item{\code{NA}} {
+     If the vector contains NAs, \code{predict.robu} will remove the 
+     corresponding covariates from the original data, and refit a new 
+     robumeta model. The prediction and confidence interval will be 
+     estimated based on the new model. 
+   }
 }
 
+\preformatted{
+  robu_mod <- robu(LOR1 ~ study_design + duration + service_hrs, 
+                   data = dropoutPrevention, 
+                   studynum = studyID, 
+                   var.eff.size = varLOR, 
+                   modelweights = "HIER",
+                   small = TRUE)
+}
+
+In this robumeta model, the first covariate is a categorical variable 
+that contains three levels: "Matched" (33 percent, dummy code: 00), 
+"Randomized"(24 percent, 01) and "non-match non-randomized"(43 percent, 
+10). The corresponding prediction vector begins with 1 (intercept), 
+and followed by 0, 0, the dummy code for "Matched". The last two elements
+are 38 and 5, the values for duration and sevice_hrs.
+ 
+\preformatted{                                          
+  predict(object = robu_mod, pred.vector = c(1,0,0,38,5),level = 0.95)
+}
+
+If we do not know the value of duration, the prediction vector should 
+be c(1,0,0,NA,5). predict.robu() will refit a new model without the 
+covariate duration, and the prediction will be based on it.
+
+\preformatted{
+  predict(object = robu_mod, pred.vector = c(1,0,0,NA,5),level = 0.95)
+}
+}

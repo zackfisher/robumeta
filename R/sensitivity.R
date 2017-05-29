@@ -1,6 +1,34 @@
-sensitivity <- function(x) UseMethod("sensitivity")
-
-sensitivity.robu <- function(x){
+#' Sensitivity Analysis for Correlated Effects RVE
+#' 
+#' \code{sensitivity} is used to assess the impact of differing rho values on
+#' the correlated effects meta-regression model.
+#' 
+#' 
+#' @aliases sensitivity
+#' @param x A dataframe containing values of rho, tau squared, coefficient
+#' estimates, and standard errors.
+#' @references
+#' 
+#' Hedges, L.V., Tipton, E., Johnson, M.C. (2010) Robust variance estimation in
+#' meta-regression with dependent effect size estimates. \emph{Research
+#' Synthesis Methods}. \bold{1}(1): 39--65. Erratum in \bold{1}(2): 164--165.
+#' DOI: 10.1002/jrsm.5
+#' 
+#' Tipton, E. (in press) Small sample adjustments for robust variance
+#' estimation with meta-regression. \emph{Psychological Methods}.
+#' @keywords robu
+#' @examples
+#' 
+#' 
+#' # Correlated Effects Model
+#' CorrMod   <-  robu(formula = effectsize ~ followup + males + binge + college, 
+#'                    data = corrdat, studynum = studyid, var.eff.size = var, 
+#'                    rho = .8, modelweights = "CORR", small = FALSE)
+#' 
+#' sensitivity(CorrMod) # Output sensitivity
+#' 
+#' @export
+sensitivity <- function(x){
   
   modelweights   <- x$modelweights
   user_weighting <- x$user_weighting
@@ -44,8 +72,9 @@ sensitivity.robu <- function(x){
     
     tau.sq1             <- term1 + rho.test[i] * term2 
     tau.sq              <- ifelse(tau.sq1 < 0, 0, tau.sq1)
-    data.full$r.weights <- 1 / (data.full$k * 
-                                  (data.full$avg.var.eff.size + tau.sq))
+    data.full$r.weights <- 1 / (as.vector(data.full$k) * 
+                                  (as.vector(data.full$avg.var.eff.size)
+                                   + as.vector(tau.sq)))
     W.r.big             <- diag(data.full$r.weights)  # W
     W.r                 <- by(data.full$r.weights, data.full$study, 
                               function(x) diag(x, nrow = length(x)))
