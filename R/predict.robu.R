@@ -113,8 +113,8 @@ predict.robu <- function(object, pred.vector, level = 0.95, ...){
   Test_result <- clubSandwich::Wald_test(new_robu_model, constraints = test_vec, vcov="CR2")
   
   #Retrieve t statistics and confidence interval. 
-  df <- Test_result$df 
-  Fvalue <- Test_result$F
+  df <- if (packageVersion("clubSandwich") > '0.4.2') Test_result$df_denom else Test_result$df 
+  Fvalue <- Test_result$Fstat
   
   tcrit <- stats::qt(1-(1-level)/2,df)
   SE_Yhat <- g_hat/sqrt(Fvalue)
