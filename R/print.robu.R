@@ -57,7 +57,7 @@ print.robu <- function(x, digits = 3,...){
                  stats::median(x$k), paste(", max ="), max(x$k),")\n")
              cat(paste("Omega.sq ="), mod_info$omega.sq, "\n")
              cat(paste("Tau.sq ="), mod_info$tau.sq, "\n\n")
-             print(output, digits = 3)
+             print(output)
              cat("---\n")
              cat("Signif. codes: < .01 *** < .05 ** < .10 *\n")
              cat("---\n")
